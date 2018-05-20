@@ -11,14 +11,14 @@ export interface ITodoState {
   tasks: ITask[]
 }
 
-const initialState: ITodoState = {
+export const initialState: ITodoState = {
   tasks: [
     {
       done: false,
       id: 1,
-      text: 'initial task'
-    }
-  ]
+      text: 'initial task',
+    },
+  ],
 }
 
 let idCounter: number = 1
@@ -26,14 +26,28 @@ let idCounter: number = 1
 const buildTask = (text: string): ITask => ({
   done: false,
   id: ++idCounter,
-  text
+  text,
 })
+
+const updateDone = (tasks: ITask[], taskId: number): ITask[] =>
+  tasks.map(task => {
+    if (task.id === taskId) {
+      task.done = true
+    }
+    return task
+  })
 
 export default reducerWithInitialState(initialState)
   .case(todoActions.addTodo, (state: ITodoState, payload) => ({
     ...state,
-    tasks: state.tasks.concat(
-      buildTask(payload)
-    )
+    tasks: state.tasks.concat(buildTask(payload)),
+  }))
+  .case(todoActions.deleteTodo, (state: ITodoState, payload) => ({
+    ...state,
+    tasks: state.tasks.filter(task => task.id !== payload),
+  }))
+  .case(todoActions.updateDoneTodo, (state: ITodoState, payload) => ({
+    ...state,
+    tasks: updateDone(state.tasks, payload),
   }))
   .build()
